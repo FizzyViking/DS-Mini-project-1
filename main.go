@@ -1,144 +1,81 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"math/rand"
+	"os"
+	"time"
 )
 
-type Phil struct {
-	name     string
-	eating   bool
-	timesAte int
-	LchIn    chan string
-	LchOut   chan string
-	RchIn    chan string
-	RchOut   chan string
-}
+func queries(phil1, phil2, phil3, phil4, phil5 *Phil, fork1, fork2, fork3, fork4, fork5 *Fork) {
+	scanner := bufio.NewScanner(os.Stdin)
+	/*
+		- each fork must include two channels (one for input and one for
 
-func createPhil(LchIn, LchOut, RchIn, RchOut chan string, name string) Phil {
-	return Phil{name: name, eating: false, timesAte: 0, LchIn: LchIn, LchOut: LchOut, RchIn: RchIn, RchOut: RchOut}
-}
+			output, both usable from outside) through which it is possible to
 
-func Eat(phil Phil) {
-	for {
-		fmt.Println(phil.name + " attempt to request picking up left")
-		phil.LchOut <- "am hungry" //Request left fork - Cant request if channel full
-		fmt.Println(phil.name + " request has been send left")
-		<-phil.LchIn //Picked up left fork
-		fmt.Println(phil.name + " confirmed pickup on left")
-		fmt.Println(phil.name + " attempt to request picking up right")
-		phil.RchOut <- "am hungry" //Request right fork -
-		fmt.Println(phil.name + " request has been send right")
-		<-phil.RchIn //Picked up Right fork
-		fmt.Println(phil.name + " confirmed pickup on right")
-		//Eating now
-		fmt.Println(phil.name + " is eating::::::::::::::::::::::")
-		phil.eating = true
-		phil.timesAte = phil.timesAte + 1
-		fmt.Println(phil.name + " attempt to drop left")
-		phil.LchOut <- "done eating" //Dropping left fork
-		fmt.Println(phil.name + " confirmed drop left")
-		fmt.Println(phil.name + " attempt to drop Right")
-		phil.RchOut <- "done eating" //Dropping Right fork
-		fmt.Println(phil.name + " confirmed drop Right")
-		fmt.Println(phil.name + " is done eating=============================")
-	}
-}
+			make queries on the state of the fork (number of times used, in use
 
-func Phil5Eat(phil Phil) {
-	for {
+			or free)*/
+	for true {
 
-		fmt.Println(phil.name + " attempt to request picking up right")
-		phil.RchOut <- "am hungry" //Request right fork -
-		fmt.Println(phil.name + " request has been send right")
-		<-phil.RchIn //Picked up Right fork
-		fmt.Println(phil.name + " confirmed pickup on right")
-		fmt.Println(phil.name + " attempt to request picking up left")
-		phil.LchOut <- "am hungry" //Request left fork - Cant request if channel full
-		fmt.Println(phil.name + " request has been send left")
-		<-phil.LchIn //Picked up left fork
-		fmt.Println(phil.name + " confirmed pickup on left")
-		//Eating now
-		fmt.Println(phil.name + " is eating::::::::::::::::::::::")
-		phil.eating = true
-		phil.timesAte = phil.timesAte + 1
-		fmt.Println(phil.name + " attempt to drop Right")
-		phil.RchOut <- "done eating" //Dropping Right fork
-		fmt.Println(phil.name + " confirmed drop Right")
-		fmt.Println(phil.name + " attempt to drop left")
-		phil.LchOut <- "done eating" //Dropping left fork
-		fmt.Println(phil.name + " confirmed drop left")
-		fmt.Println(phil.name + " is done eating=============================")
-	}
-}
+		fmt.Println("Choose a philosopher or fork by writting p1-5 or f1-5")
+		scanner.Scan()
+		cmd := scanner.Text()
 
-type Fork struct {
-	name      string
-	inUse     bool
-	timesUsed int
-	LchIn     chan string
-	LchOut    chan string
-	RchIn     chan string
-	RchOut    chan string
-}
+		if cmd == "p1" {
+			phil1.qIn <- "requesting query"
+			phil1.qIn <- "requesting query"
 
-func createFork(LchIn, LchOut, RchIn, RchOut chan string, name string) Fork {
-	return Fork{name: name, inUse: false, timesUsed: 0, LchIn: LchIn, LchOut: LchOut, RchIn: RchIn, RchOut: RchOut}
-}
+		} else if cmd == "p2" {
+			phil2.qIn <- "requesting query"
+			phil2.qIn <- "requesting query"
 
-func Pickup(fork Fork) {
+		} else if cmd == "p3" {
+			phil3.qIn <- "requesting query"
+			phil3.qIn <- "requesting query"
 
-	for {
-		select {
-		case <-fork.LchIn:
-			//fmt.Println(fork.name + " fork is picked up by left")
-			fmt.Println(fork.name + " in use by right UUUUUUUUUU")
-			fork.inUse = true
-			fork.timesUsed = fork.timesUsed + 1
-			fork.LchOut <- "pick me up"
-			<-fork.LchIn
-			fmt.Println(fork.name + " not in use by left NNNNNNNNNN")
-			//fmt.Println(fork.name + " fork is dropped by left")
-			fork.inUse = false
-		case <-fork.RchIn:
-			//fmt.Println(fork.name + " fork is picked up by right")
-			fmt.Println(fork.name + " in use by right UUUUUUUUUU")
-			fork.inUse = true
-			fork.timesUsed = fork.timesUsed + 1
-			fork.RchOut <- "pick me up"
-			<-fork.RchIn
-			//fmt.Println(fork.name + " fork is dropped by right")
-			fmt.Println(fork.name + " not in use by right NNNNNNNNNN")
-			fork.inUse = false
+		} else if cmd == "p4" {
+			phil4.qIn <- "requesting query"
+			phil4.qIn <- "requesting query"
+
+		} else if cmd == "p5" {
+			phil5.qIn <- "requesting query"
+			phil5.qIn <- "requesting query"
+
+		} else if cmd == "f1" {
+			fork1.qIn <- "requesting query"
+			fork1.qIn <- "requesting query"
+
+		} else if cmd == "f2" {
+			fork2.qIn <- "requesting query"
+			fork2.qIn <- "requesting query"
+
+		} else if cmd == "f3" {
+			fork3.qIn <- "requesting query"
+			fork3.qIn <- "requesting query"
+
+		} else if cmd == "f4" {
+			fork4.qIn <- "requesting query"
+			fork4.qIn <- "requesting query"
+
+		} else if cmd == "f5" {
+			fork5.qIn <- "requesting query"
+			fork5.qIn <- "requesting query"
 		}
 	}
-}
-func send1(in, out chan string) {
-	for {
-		fmt.Println("starting send")
-		out <- "hej"
-		<-in
-	}
 
 }
 
-func get1(in, out chan string) {
-	for {
-		fmt.Println("starting get")
-		x := <-in
-		out <- "ok"
-		fmt.Println("In is first " + x)
-		x1 := <-in
-		fmt.Println("In is then " + x1)
-	}
+func randomPause(max int) {
+	time.Sleep(time.Millisecond * time.Duration(rand.Intn(max*1000)))
 }
 
 func main() {
 	fmt.Println("Starting main")
 	ch1 := make(chan string)
 	ch2 := make(chan string)
-	//go send1(ch1, ch2)
-	//go get1(ch2, ch1)
-
 	ch3 := make(chan string)
 	ch4 := make(chan string)
 	ch5 := make(chan string)
@@ -158,19 +95,100 @@ func main() {
 	ch19 := make(chan string)
 	ch20 := make(chan string)
 
-	go Eat(createPhil(ch1, ch2, ch20, ch19, "Phil 1"))
-	go Eat(createPhil(ch5, ch6, ch4, ch3, "Phil 2"))
-	go Eat(createPhil(ch9, ch10, ch8, ch7, "Phil 3"))
-	go Eat(createPhil(ch13, ch14, ch12, ch11, "Phil 4"))
-	go Phil5Eat(createPhil(ch17, ch18, ch16, ch15, "Phil 5"))
-	// Byt om på ch 15 og 18
-	go Pickup(createFork(ch3, ch4, ch2, ch1, "Fork 1"))
-	go Pickup(createFork(ch7, ch8, ch6, ch5, "Fork 2"))
-	go Pickup(createFork(ch11, ch12, ch10, ch9, "Fork 3"))
-	go Pickup(createFork(ch15, ch16, ch14, ch13, "Fork 4"))
-	go Pickup(createFork(ch19, ch20, ch18, ch17, "Fork 5"))
+	p1in := make(chan string, 2)
+	p1out := make(chan string, 2)
+	p2in := make(chan string, 2)
+	p2out := make(chan string, 2)
+	p3in := make(chan string, 2)
+	p3out := make(chan string, 2)
+	p4in := make(chan string, 2)
+	p4out := make(chan string, 2)
+	p5in := make(chan string, 2)
+	p5out := make(chan string, 2)
+
+	f1in := make(chan string, 2)
+	f1out := make(chan string, 2)
+	f2in := make(chan string, 2)
+	f2out := make(chan string, 2)
+	f3in := make(chan string, 2)
+	f3out := make(chan string, 2)
+	f4in := make(chan string, 2)
+	f4out := make(chan string, 2)
+	f5in := make(chan string, 2)
+	f5out := make(chan string, 2)
+
+	phil1 := createPhil(ch1, ch2, ch20, ch19, p1in, p1out, "Phil 1")
+	phil2 := createPhil(ch5, ch6, ch4, ch3, p2in, p2out, "Phil 2")
+	phil3 := createPhil(ch9, ch10, ch8, ch7, p3in, p3out, "Phil 3")
+	phil4 := createPhil(ch13, ch14, ch12, ch11, p4in, p4out, "Phil 4")
+	phil5 := createPhil(ch17, ch18, ch16, ch15, p5in, p5out, "Phil 5")
+
+	fork1 := createFork(ch3, ch4, ch2, ch1, f1in, f1out, "Fork 1")
+	fork2 := createFork(ch7, ch8, ch6, ch5, f2in, f2out, "Fork 2")
+	fork3 := createFork(ch11, ch12, ch10, ch9, f3in, f3out, "Fork 3")
+	fork4 := createFork(ch15, ch16, ch14, ch13, f4in, f4out, "Fork 4")
+	fork5 := createFork(ch19, ch20, ch18, ch17, f5in, f5out, "Fork 5")
+
+	phil1pointer := &phil1
+	phil2pointer := &phil2
+	phil3pointer := &phil3
+	phil4pointer := &phil4
+	phil5pointer := &phil5
+
+	fork1pointer := &fork1
+	fork2pointer := &fork2
+	fork3pointer := &fork3
+	fork4pointer := &fork4
+	fork5pointer := &fork5
+
+	go EatByStartingLeft(phil1pointer)
+	go EatByStartingLeft(phil2pointer)
+	go EatByStartingLeft(phil3pointer)
+	go EatByStartingLeft(phil4pointer)
+	go EatByStartingRight(phil5pointer)
+
+	go Pickup(fork1pointer)
+	go Pickup(fork2pointer)
+	go Pickup(fork3pointer)
+	go Pickup(fork4pointer)
+	go Pickup(fork5pointer)
+
+	//go queries(phil1pointer, phil2pointer, phil3pointer, phil4pointer, phil5pointer, fork1pointer, fork2pointer, fork3pointer, fork4pointer, fork5pointer)
 
 	for {
+		fmt.Println("==================================")
 		// have dinner forever ...
+		time.Sleep(time.Millisecond * time.Duration(2*1000))
+		p1in <- "requesting query"
+		<-p1out
+		time.Sleep(time.Millisecond * time.Duration(2*1000))
+		p2in <- "requesting query"
+		<-p2out
+		time.Sleep(time.Millisecond * time.Duration(2*1000))
+		p3in <- "requesting query"
+		<-p3out
+		time.Sleep(time.Millisecond * time.Duration(2*1000))
+		p4in <- "requesting query"
+		<-p4out
+		time.Sleep(time.Millisecond * time.Duration(2*1000))
+		p5in <- "requesting query"
+		<-p5out
+
+		time.Sleep(time.Millisecond * time.Duration(2*1000))
+		f1in <- "requesting query"
+		<-f1out
+		time.Sleep(time.Millisecond * time.Duration(2*1000))
+		f2in <- "requesting query"
+		<-f2out
+		time.Sleep(time.Millisecond * time.Duration(2*1000))
+		f3in <- "requesting query"
+		<-f3out
+		time.Sleep(time.Millisecond * time.Duration(2*1000))
+		f4in <- "requesting query"
+		<-f4out
+		time.Sleep(time.Millisecond * time.Duration(2*1000))
+		f5in <- "requesting query"
+		<-f5out
+		fmt.Println("------------------")
 	}
 }
